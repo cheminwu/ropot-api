@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="tue.student.ed.dao.MoistureLogMapper">
+    <resultMap id="MoistureLogMap" type="tue.student.ed.module.MoistureLog">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="pot_id" property="potId" jdbcType="INTEGER" />
+        <result column="moisture_degree" property="moistureDegree" jdbcType="INTEGER" />
+        <result column="datetime" property="datetime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <resultMap id="HourlyLogMap" type="tue.student.ed.module.HourlyLog">
+        <result column="hour" property="hour" jdbcType="INTEGER" />
+        <result column="number" property="number" jdbcType="DOUBLE" />
+    </resultMap>
+
+    <select id="find" parameterType="java.util.Map" resultMap="MoistureLogMap">
+        SELECT *
+        FROM moisture_log
+        WHERE 1 = 1
+        <if test="potId != null">AND pot_id = #{potId}</if>
+        <if test="MDUpperBound != null">AND datetime &lt; #{MDUpperBound}</if>
+        <if test="MDLowerBound != null">AND datetime &gt; #{MDLowerBound}</if>
+        ORDER BY datetime DESC
+    </select>
+
+    <select id="getLast" parameterType="java.util.Map" resultMap="MoistureLogMap">
+        SELECT *
+        FROM moisture_log
+        WHERE 1 = 1
+        <if test="potId != null">AND pot_id = #{potId}</if>
+        ORDER BY datetime DESC
+        limit 0,1
+    </select>
+
+    <insert id="save" parameterType="tue.student.ed.module.MoistureLog">
+        INSERT INTO moisture_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="potId != null">
+                pot_id,
+            </if>
+            <if test="moistureDegree != null">
+                moisture_degree,
+            </if>
+            <if test="datetime != null">
+                datetime
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="potId != null">
+                #{potId},
+            </if>
+            <if test="moistureDegree != null">
+                #{moistureDegree},
+            </if>
+            <if test="datetime != null">
+                #{datetime}
+            </if>
+        </trim>
+    </insert>
+
+
+    <select id="getHourly" parameterType="java.util.Map" resultMap="HourlyLogMap">
+         select DATE_FORMAT(datetime, '%H') hour, round(avg(moisture_degree), 2) number
+         from moisture_log
+         where DATE_FORMAT(datetime, '%Y-%m-%d') = #{date}
+            and pot_id = #{potId}
+         group by hour order by hour asc;
+    </select>
+
+</mapper>

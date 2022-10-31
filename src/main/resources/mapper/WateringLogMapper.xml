@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="tue.student.ed.dao.WateringLogMapper">
+    <resultMap id="WateringLogMap" type="tue.student.ed.module.WateringLog">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="pot_id" property="potId" jdbcType="INTEGER" />
+        <result column="watering_seconds" property="wateringSeconds" jdbcType="INTEGER" />
+        <result column="watering_time" property="wateringTime" jdbcType="TIMESTAMP" />
+        <result column="schedule_id" property="scheduleId" jdbcType="INTEGER" />
+    </resultMap>
+
+    <select id="find" parameterType="java.util.Map" resultMap="WateringLogMap">
+        SELECT *
+        FROM watering_log
+        WHERE 1 = 1
+        <if test="potId != null">AND pot_id = #{potId}</if>
+
+    </select>
+
+    <insert id="save" parameterType="tue.student.ed.module.WateringLog">
+        INSERT INTO watering_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="potId != null">
+                pot_id,
+            </if>
+            <if test="scheduleId != null">
+                schedule_id,
+            </if>
+            <if test="wateringTime != null">
+                watering_time,
+            </if>
+            <if test="wateringSeconds != null">
+                watering_seconds
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="potId != null">
+                #{potId},
+            </if>
+            <if test="scheduleId != null">
+                #{scheduleId},
+            </if>
+            <if test="wateringTime != null">
+                #{wateringTime},
+            </if>
+            <if test="wateringSeconds != null">
+                #{wateringSeconds}
+            </if>
+        </trim>
+    </insert>
+</mapper>

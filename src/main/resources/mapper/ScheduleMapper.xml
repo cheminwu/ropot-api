@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="tue.student.ed.dao.ScheduleMapper">
+    <resultMap id="ScheduleMap" type="tue.student.ed.module.Schedule">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="pot_id" property="potId" jdbcType="INTEGER" />
+        <result column="watering_time" property="wateringTime" jdbcType="TIMESTAMP" />
+        <result column="watering_duration" property="wateringDuration" jdbcType="INTEGER" />
+        <result column="status" property="status" jdbcType="CHAR" />
+    </resultMap>
+
+    <select id="find" parameterType="java.util.Map" resultMap="ScheduleMap">
+        SELECT *
+        FROM schedule
+        WHERE 1 = 1
+        <if test="potId != null">AND pot_id = #{potId}</if>
+        <if test="WTUpperBound != null">AND watering_time &lt; #{WTUpperBound}</if>
+        <if test="WTLowerBound != null">AND watering_time &gt; #{WTLowerBound}</if>
+        <if test="status != null">AND status = #{status}</if>
+        ORDER BY watering_time DESC
+    </select>
+
+    <select id="findLastTask" parameterType="INTEGER" resultMap="ScheduleMap">
+        SELECT *
+        FROM schedule
+        WHERE pot_id = #{potId}
+        ORDER BY watering_time DESC
+        limit 0,1
+    </select>
+
+    <insert id="save" parameterType="tue.student.ed.module.Schedule">
+        INSERT INTO schedule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="potId != null">
+                pot_id,
+            </if>
+            <if test="wateringTime != null">
+                watering_time,
+            </if>
+            <if test="wateringDuration != null">
+                watering_duration,
+            </if>
+            <if test="status != null">
+                status
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="potId != null">
+                #{potId},
+            </if>
+            <if test="wateringTime != null">
+                #{wateringTime},
+            </if>
+            <if test="wateringDuration != null">
+                #{wateringDuration},
+            </if>
+            <if test="status != null">
+                #{status}
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="delete" parameterType="INTEGER">
+        DELETE
+        FROM schedule
+        WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="tue.student.ed.module.Schedule">
+        UPDATE schedule
+        SET status = #{status},
+        watering_time = watering_time
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateBefore" parameterType="tue.student.ed.module.Schedule">
+        UPDATE schedule
+        SET status = #{status},
+        watering_time = watering_time
+        WHERE pot_id = #{potId}
+        and (status = 'PENDING' or status = 'WATERING')
+            and watering_time &lt;= #{wateringTime}
+    </update>
+</mapper>

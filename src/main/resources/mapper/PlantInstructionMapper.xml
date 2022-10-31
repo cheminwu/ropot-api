@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="tue.student.ed.dao.PlantInstructionMapper">
+    <resultMap id="PlantInstructionMap" type="tue.student.ed.module.PlantInstruction">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="name" property="name" jdbcType="INTEGER" />
+        <result column="temperature" property="temperature" jdbcType="VARCHAR" />
+        <result column="moisture" property="moisture" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+    </resultMap>
+
+    <select id="find" parameterType="int" resultMap="PlantInstructionMap">
+        SELECT *
+        FROM plant_instruction
+        WHERE type = #{type}
+    </select>
+</mapper>
